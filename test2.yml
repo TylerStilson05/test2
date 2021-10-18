@@ -1,0 +1,29 @@
+- name: test 2
+  hosts: all
+  gather_facts: false
+  become: yes
+  tasks:
+    - name: Wait 300 seconds, but only start checking after 60
+      wait_for_connection:
+        delay: 60
+        timeout: 300
+    - name: Add the users
+      ansible.builtin.user:
+        name: "{{ item.name }}"
+      loop:
+        - { name: 'baymax' }
+        - { name: 'hiro' }
+        - { name: 'tadashi' }
+    - name: Download stuff
+      get_url:
+        url: http://cit.dixie.edu/it/3100/examples.examples/resource-hogs.tgz
+        dest: /usr/local/bin
+    - name: Install fortune package
+      yum:
+        update_cache: yes
+        name: httpd
+        state: latest
+    - name: Copy file with owner and permissions
+      ansible.builtin.copy:
+        src: /etc/passwd
+        dest: /tmp/passwd
